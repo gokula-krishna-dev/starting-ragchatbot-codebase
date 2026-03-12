@@ -60,6 +60,9 @@ function setupEventListeners() {
     }
   });
 
+  // New Chat button
+  document.getElementById('newChatButton').addEventListener('click', startNewChat);
+
   // Suggested questions
   document.querySelectorAll('.suggested-item').forEach((button) => {
     button.addEventListener('click', (e) => {
@@ -157,7 +160,14 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.map((s) => escapeHtml(s)).join(', ')}</div>
+                <div class="sources-content">${sources
+                  .map((s) => {
+                    if (s.link) {
+                      return `<a href="${s.link}" target="_blank" rel="noopener noreferrer">${escapeHtml(s.name)}</a>`;
+                    }
+                    return `<span>${escapeHtml(s.name)}</span>`;
+                  })
+                  .join('')}</div>
             </details>
         `;
   }
@@ -177,6 +187,18 @@ function escapeHtml(text) {
 }
 
 // Removed removeMessage function - no longer needed since we handle loading differently
+
+async function startNewChat() {
+  // Clean up the current session on the backend
+  if (currentSessionId) {
+    try {
+      await fetch(`${API_URL}/session/${currentSessionId}`, { method: 'DELETE' });
+    } catch (e) {
+      // Best-effort cleanup; proceed regardless
+    }
+  }
+  createNewSession();
+}
 
 async function createNewSession() {
   currentSessionId = null;
