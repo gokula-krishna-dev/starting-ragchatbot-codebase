@@ -21,7 +21,7 @@ cd backend && uv run uvicorn app:app --reload --port 8000
 # API docs: http://localhost:8000/docs
 ```
 
-No test suite exists yet.
+Run tests with: `uv run --group test pytest`
 
 ## Architecture
 
