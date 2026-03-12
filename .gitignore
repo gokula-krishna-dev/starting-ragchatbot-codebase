@@ -26,6 +26,9 @@ uploads/
 *.swp
 *.swo
 
+# Node (frontend tooling)
+node_modules/
+
 # OS
 .DS_Store
 Thumbs.db
