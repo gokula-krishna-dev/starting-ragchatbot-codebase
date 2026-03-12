@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, themeToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,13 +16,42 @@ document.addEventListener('DOMContentLoaded', () => {
   totalCourses = document.getElementById('totalCourses');
   courseTitles = document.getElementById('courseTitles');
 
+  themeToggle = document.getElementById('themeToggle');
+
+  initTheme();
   setupEventListeners();
   createNewSession();
   loadCourseStats();
 });
 
+// Theme Functions
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeToggleLabel(savedTheme);
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeToggleLabel(newTheme);
+}
+
+function updateThemeToggleLabel(theme) {
+  if (themeToggle) {
+    const label = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    themeToggle.setAttribute('aria-label', label);
+    themeToggle.setAttribute('title', label);
+  }
+}
+
 // Event Listeners
 function setupEventListeners() {
+  // Theme toggle
+  themeToggle.addEventListener('click', toggleTheme);
+
   // Chat functionality
   sendButton.addEventListener('click', sendMessage);
   chatInput.addEventListener('keypress', (e) => {
@@ -128,7 +157,7 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">${sources.map((s) => escapeHtml(s)).join(', ')}</div>
             </details>
         `;
   }
@@ -163,14 +192,12 @@ async function createNewSession() {
 // Load course statistics
 async function loadCourseStats() {
   try {
-    // Loading course stats
     const response = await fetch(`${API_URL}/courses`);
     if (!response.ok) {
       throw new Error('Failed to load course stats');
     }
 
     const data = await response.json();
-    // Course data received
 
     // Update stats in UI
     if (totalCourses) {
@@ -181,7 +208,7 @@ async function loadCourseStats() {
     if (courseTitles) {
       if (data.course_titles && data.course_titles.length > 0) {
         courseTitles.innerHTML = data.course_titles
-          .map((title) => `<div class="course-title-item">${title}</div>`)
+          .map((title) => `<div class="course-title-item">${escapeHtml(title)}</div>`)
           .join('');
       } else {
         courseTitles.innerHTML = '<span class="no-courses">No courses available</span>';
