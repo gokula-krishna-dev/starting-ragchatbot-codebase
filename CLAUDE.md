@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+<!-- Dummy PR test change -->
+
 ## Project Overview
 
 A RAG (Retrieval-Augmented Generation) chatbot for querying course materials. FastAPI backend serves both the API and a static HTML/JS/CSS frontend. Uses ChromaDB for vector storage, sentence-transformers for embeddings, and Anthropic Claude for response generation with tool-based search.
@@ -21,7 +23,7 @@ cd backend && uv run uvicorn app:app --reload --port 8000
 # API docs: http://localhost:8000/docs
 ```
 
-No test suite exists yet.
+Run tests with: `uv run --group test pytest`
 
 ## Architecture
 
